@@ -1,1 +1,1 @@
-<?php echo "Happy Birthday"; ?>
+<?="Happy Birthday"?>

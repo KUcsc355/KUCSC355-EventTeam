@@ -2,6 +2,8 @@
 /**
  * Change this so that it includes connect.php from the database
  * team in the final build.
+ *
+ * Update to eventually use PDO for database access.
  */
 require_once("settings.php");
 
@@ -26,6 +28,15 @@ class Events {
     public function createEvent($name, $speaker, $address, $date, $time, $description) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = connect();
+
+            // Create legal sql strings.
+            $name           = $db->real_escape_string($name);
+            $speaker        = $db->real_escape_string($speaker);
+            $address        = $db->real_escape_string($address);
+            $date           = $db->real_escape_string($date);
+            $time           = $db->real_escape_string($time);
+            $description    = $db->real_escape_string($description);
+
             $sql = "INSERT INTO events (name, speaker, address, date, time, description) VALUES ('$name', '$speaker', '$address', '$date', '$time', '$description')";
 
             if ($db->error) {
