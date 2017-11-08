@@ -25,58 +25,53 @@ class Events {
      * Replace param $time in the final build with $fee since the database team
      * uses $date for the actual date and time as well.
      */
-    public function createEvent($name, $speaker, $address, $date, $time, $description) {
+    public function createEvent($name, $speaker, $address, $date, $time, $fee, $description) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = connect();
-
-            // Create legal sql strings.
-            $name           = $db->real_escape_string($name);
-            $speaker        = $db->real_escape_string($speaker);
-            $address        = $db->real_escape_string($address);
-            $date           = $db->real_escape_string($date);
-            $time           = $db->real_escape_string($time);
-            $description    = $db->real_escape_string($description);
-
-            $sql = "INSERT INTO events (name, speaker, address, date, time, description) VALUES ('$name', '$speaker', '$address', '$date', '$time', '$description')";
-
-            if ($db->error) {
-                die($db->error);
-            }
-
-            if ($db->query($sql)) {
-                // echo "Added event successfully!";
-            } else {
-                echo "Error: " . $sql . "<br>" . $db->error;
-            }
-
+            $stmt = $db->prepare("INSERT INTO events (name, speaker, address, date, time, description) VALUES (:name, :speaker, :address, :date, :time, :description)");
+            $stmt->execute(array('name' => $name, 'speaker' => $speaker, 'address' => $address, 'date' => $date, 'time' => $time, 'description' => $description));
             disconnect($db);
         }
     }
 
+    public function deleteEvent() {
+    }
+
     public function getTotalEvents() {
         $db = connect();
-        $sql = "SELECT * FROM events";
-        $result = $db->query($sql);
-        $size = mysqli_num_rows($result);
+        $stmt = $db->prepare("SELECT * FROM events");
+        $stmt->execute();
         disconnect($db);
-        return $size;
+        return $stmt->rowCount();
     }
 
     /**
      * TO-DO: Add alternate methods for retrieving an event (i.e., by name when
-     * the index is unknown). Maybe even divide this method into submethods that
-     * will retrieve each field individually.
+     * the index is unknown).
      */
     public function retrieveEvent($index, $field) {
         $db = connect();
-        $sql = "SELECT * FROM events ORDER BY id DESC";
-        $result = $db->query($sql);
+        $savedRow = null;
+        $seekPos = 0;
+        $stmt = $db->prepare("SELECT * FROM events ORDER BY id DESC");
+        $stmt->execute();
 
-        mysqli_data_seek($result, $index);
-        $row = mysqli_fetch_assoc($result);
+        // Code maintenance on this block will be needed.
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($seekPos == $index) {
+                $savedRow = $row;
+                break;
+            }
+            ++$seekPos;
+        }
+
         disconnect($db);
 
-        return $row[$field];
+        return $savedRow[$field];
+    }
+
+    public function updateEvent() {
+
     }
 }
 

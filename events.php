@@ -182,9 +182,10 @@ function getTime($time) {
         $eventDesc      = $_POST['eventDesc'];
         $eventDate      = $_POST['eventDate'];
         $eventTime      = getTime($_POST['eventTime']);
+        $eventFee       = 0;
         $eventAddress   = $_POST['eventAddress'];
 
-        $event->createEvent($eventName, $eventSpeakers, $eventAddress, $eventDate, $eventTime, $eventDesc);
+        $event->createEvent($eventName, $eventSpeakers, $eventAddress, $eventDate, $eventTime, $eventFee, $eventDesc);
     }
   ?>
 
