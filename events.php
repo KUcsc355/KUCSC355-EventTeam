@@ -1,11 +1,5 @@
 <?php
-/*
-if ($_POST) {
-   // Redirect to this page.
-   header('HTTP/1.1 303 See Other');
-   header('Location: ./?page_id=53');
-}
-*/
+
 require_once("clsEvents.php");
 
 function getTime($time) {
@@ -179,23 +173,19 @@ function getTime($time) {
 
   <?
     $event = new Events();
-    $eventSpeakers = "";
     /**
      * This check needs a miracle. Will fix later.
      */
-    if ($_POST['eventName'] !== "" && $_POST['eventName'] !== " " && $_POST['eventName'] !== NULL && $_POST['eventDesc'] !== "" && $_POST['eventDesc'] !== NULL && $_POST['eventDesc'] !== " " && isset($_POST['eventName'], $_POST['eventDesc'], $_POST['eventDate'], $_POST['eventTime'], $_POST['eventAddress'])) {
-        $eventName = $db->real_escape_string($_POST['eventName']);
-        $eventDesc = $db->real_escape_string($_POST['eventDesc']);
-        $eventDate = $db->real_escape_string($_POST['eventDate']);
-        $eventTime = getTime($db->real_escape_string($_POST['eventTime']));
-        $eventAddress = $db->real_escape_string($_POST['eventAddress']);
+    if (trim($_POST['eventName']) !== "" && trim($_POST['eventDesc']) !== "" && isset($_POST['eventName'], $_POST['eventDesc'], $_POST['eventDate'], $_POST['eventTime'], $_POST['eventAddress'])) {
+        $eventName      = $_POST['eventName'];
+        $eventSpeakers  = isset($_POST['eventSpeakers']) ? $_POST['eventSpeakers'] : "";
+        $eventDesc      = $_POST['eventDesc'];
+        $eventDate      = $_POST['eventDate'];
+        $eventTime      = getTime($_POST['eventTime']);
+        $eventFee       = 0;
+        $eventAddress   = $_POST['eventAddress'];
 
-        // This one can be checked separately.
-        if (isset($_POST['eventSpeakers'])) {
-            $eventSpeakers = $db->real_escape_string($_POST['eventSpeakers']);
-        }
-
-        $event->createEvent($eventName, $eventSpeakers, $eventAddress, $eventDate, $eventTime, $eventDesc);
+        $event->createEvent($eventName, $eventSpeakers, $eventAddress, $eventDate, $eventTime, $eventFee, $eventDesc);
     }
   ?>
 
@@ -212,12 +202,6 @@ function getTime($time) {
         </div>
       </div>
       <?
-        $db = connect();
-
-        if ($db->error) {
-            die($db->error);
-        }
-
         for ($i = 0; $i < $event->getTotalEvents(); ++$i) {
             $eName      = $event->retrieveEvent($i, "name");
             $eSpeakers  = $event->retrieveEvent($i, "speaker");
@@ -239,9 +223,6 @@ function getTime($time) {
       </div>
       <?
         }
-
-        // Kill the connection.
-        disconnect($db);
       ?>
     </div>
   </div>
