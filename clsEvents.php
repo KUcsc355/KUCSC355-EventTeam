@@ -35,6 +35,25 @@ class Events {
     }
 
     public function deleteEvent() {
+
+    }
+
+    /**
+     * Retrieve events from this day on forward.
+     * These events are stored in an array.
+     */
+    public function getAllEventInfo() {
+        $db = connect();
+        $events = array();
+        $stmt = $db->prepare("SELECT * FROM events WHERE date >= CURDATE() ORDER BY id DESC");
+        $stmt->execute();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $events[] = $row;
+        }
+
+        disconnect($db);
+        return $events;
     }
 
     public function getTotalEvents() {
@@ -56,7 +75,6 @@ class Events {
         $stmt = $db->prepare("SELECT * FROM events ORDER BY id DESC");
         $stmt->execute();
 
-        // Code maintenance on this block will be needed.
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($seekPos == $index) {
                 $savedRow = $row;
