@@ -2,8 +2,6 @@
 /**
  * Change this so that it includes connect.php from the database
  * team in the final build.
- *
- * Update to eventually use PDO for database access.
  */
 require_once("settings.php");
 
@@ -21,10 +19,6 @@ class Events {
 
     }
 
-    /**
-     * Replace param $time in the final build with $fee since the database team
-     * uses $date for the actual date and time as well.
-     */
     public function createEvent($name, $speaker, $address, $date, $time, $fee, $description) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = connect();
@@ -62,6 +56,18 @@ class Events {
         $stmt->execute();
         disconnect($db);
         return $stmt->rowCount();
+    }
+
+    /**
+     * Not tested.
+     */
+    public function register($eventID, $userID) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $db = connect();
+            $stmt = $db->prepare("INSERT INTO eventAttendance (eventID, userID) VALUES (:eventID, :userID)");
+            $stmt->execute(array('eventID' => $eventID, 'userID' => $userID));
+            disconnect($db);
+        }
     }
 
     /**
